@@ -1,0 +1,6 @@
+﻿啊实打实打算asda是
+
+create table mysql(
+id int COMMENT '自动增长主键',
+primary key(id)
+)COMMENT='学生表'
