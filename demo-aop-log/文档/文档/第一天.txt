@@ -1,0 +1,194 @@
+安装ecplise
+安装MYSQL
+安装JDK，(最好1.7的版本，1.8也可以)
+安装SQLServer客户端
+ecplise 安装SVN插件
+安装一个Jboos
+安装一个Tomcat
+
+调用 上下文或请求响应，获取spring容器
+配置一个试图解析器，
+错误页面的定义有几种
+依赖注入
+
+
+自动装配，在有扫描的时候会强制注入，
+一般最后搭建一个试图解析器在SpringMVC的配置文件中
+
+
+搭建一个spring MVC DEMO
+
+SringMVC来自模块spring-webmvc的名称，但他通常被称为"Spring MVC"
+
+contextConfigLocation
+传递给上下文实例（由其指定contextClass）的字符串，用于指示可找到上下文的位置。该字符串可能包含多个字符串（使用逗号作为分隔符）以支持多个上下文。
+在定义了两次bean的多个上下文位置的情况下，最新的位置优先。
+
+拦截
+所有HandlerMapping实现都支持处理程序拦截器，当您想要将特定功能应用于某些请求时，该拦截器非常有用。拦截器必须HandlerInterceptor从 org.springframework .web .servlet包中实现
+三种方法，这些方法应该提供足够的灵活性来进行各种预处理和后处理：
+preHandle(..)?-? 在实际处理程序执行之前
+postHandle(..)?-? 后在处理器执行
+afterCompletion(..)?-? 完成请求完成后
+
+该preHandle(..)方法返回一个布尔值。您可以使用此方法来中断或继续处理执行链。当此方法返回时true，处理程序执行链将继续; 当它返回false时，
+DispatcherServlet 假设拦截器本身负责处理请求（并且例如呈现适当的视图），并且不继续执行执行链中的其他拦截器和实际处理器。
+
+HandlerExceptionResolver(处理程序异常解析器)  ->  	描述
+SimpleMappingExceptionResolver 		      ->  	异常类名称和错误视图名称之间的映射。用于在浏览器应用程序中呈现错误页面。
+DefaultHandlerExceptionResolver 	      ->  	解决Spring MVC引发的异常并将它们映射到HTTP状态代码。
+ResponseStatusExceptionResolver 	      ->  	根据@ResponseStatus注释中的值解决注释中的异常并将其映射到HTTP状态代码。
+ExceptionHandlerExceptionResolver 	      -> 	通过调用@ExceptionHandler一个@Controller或一个 @ControllerAdvice类中的方法来解决异常。请参阅异常方法。
+
+
+处理
+您通过声明多个异常解析器bean来链接异常解析器，并在必要时设置order属性以指定排序。请记住，订单属性越高，异常解析器定位在链中的越晚。
+
+HandlerExceptionResolver指定它可以返回的合同：
+
+ModelAndView 指向错误视图。
+
+ModelAndView如果在解析器中处理异常，则为空。
+
+null如果异常仍未解决，供后续解析器尝试使用; 如果任何解析器仍然未解析异常，则将其重新抛出并留下来传播??给Servlet容器。
+
+配置异常处理就像将HandlerExceptionResolverSpring 添加到Spring配置一样简单。在MVC配置自动宣告违约Spring MVC的例外内置解析器，用于@ResponseStatus注释例外，
+并支持的@ExceptionHandler方法。您可以自定义该列表或将其替换。
+
+容器错误页面
+如果任何异常仍未解决，HandlerExceptionResolver因此尚未传播，或者响应状态设置为错误状态（即4xx，5xx），则Servlet容器可能会在HTML中呈现默认错误页面。
+要自定义容器的默认错误页面，可以在以下位置声明错误页面映射web.xml：
+<error-page>
+    <location>/error</location>
+</error-page>
+
+鉴于上述情况，当异常冒泡时，或者响应具有错误状态时，Servlet容器会在容器内将ERROR分派到配置的URL（例如“/ error”）。然后这个被处理DispatcherServlet，
+可能映射到一个@Controller可以实现的模型返回一个错误视图名称或者呈现JSON响应，如下所示：
+@RestController
+public class ErrorController {
+
+    @RequestMapping(path = "/error")
+    public Map<String, Object> handle(HttpServletRequest request) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("status", request.getAttribute("javax.servlet.error.status_code"));
+        map.put("reason", request.getAttribute("javax.servlet.error.message"));
+        return map;
+    }
+}
+
+(视图解析器)  				->  	描述（试图控制器类存在org.springframework.web.server.view里面）
+
+AbstractCachingViewResolver		->  	AbstractCachingViewResolver它们解析的缓存视图实例的子类。缓存提高了某些视图技术的性能。可以通过设置cache属性
+						来关闭缓存false。此外，如果您必须在运行时刷新某个视图（例如，在修改FreeMarker模板时），则可以使用该
+						removeFromCache(String viewName, Locale loc)方法。
+XmlViewResolver	 	      		->  	它的实现ViewResolver接受使用与XML的XML工厂相同的DTD以XML编写的配置文件。默认的配置文件是 /WEB-INF/views.xml。
+
+ResourceBundleViewResolver		->  	它的实现ViewResolver在一个ResourceBundlebundle 中使用bean定义，由bundle基名指定，对于它应该解析的每个视图，
+						它使用该属性的值[viewname].(class)作为视图类，并使用该属性的值[viewname].url作为视图url。示例可以在View Technologies
+						的章节中找到 。
+
+UrlBasedViewResolver			-> 	ViewResolver无需显式映射定义即可轻松实现直接解析逻辑视图名称到URL 的接口。如果您的逻辑名称以直观的方式与您的视图资源
+						的名称匹配，而不需要任意映射，则这很合适。
+
+InternalResourceViewResolver		->	它的方便子类UrlBasedViewResolver支持InternalResourceView（实际上是Servlet和JSP）和子类（如JstlView和）TilesView。
+						您可以使用此解析器为所有视图指定视图类 setViewClass(..)。有关UrlBasedViewResolver详细信息，请参阅javadocs。
+
+FreeMarkerViewResolver			->	该方便的子类UrlBasedViewResolver支持FreeMarkerView它们的自定义子类。
+
+ContentNegotiatingViewResolver		->	ViewResolver根据请求文件名或Accept标题实现解析视图的接口
+
+
+处理
+您可以通过声明多个解析器bean来链接视图解析器，并在必要时通过设置order属性来指定排序。请记住，订单属性越高，视图解析器在链中的位置越晚。
+
+a的合约ViewResolver指定它可以返回null来指示无法找到视图。但是，在JSP的情况下，InternalResourceViewResolver找出JSP是否存在的唯一方法是执行分派 RequestDispatcher。因此，
+InternalResourceViewResolver必须始终将其配置为按视图解析器的整体顺序排列。
+
+
+
+1.2.9。语言环境
+
+当请求进入时，DispatcherServlet查找区域设置解析器，并且如果它找到一个它尝试使用它来设置区域设置。使用该RequestContext.getLocale() 方法，您始终可以检索由区域设置
+解析程序解析的区域设置。
+
+时区
+该LocaleContextResolver接口提供了一个扩展LocaleResolver，使解析器可以提供更丰富的LocaleContext，其中可能包括时区信息。
+可用时，TimeZone可以使用该RequestContext.getTimeZone()方法获取 用户。时区信息将自动由日期/时间Converter和FormatterSpring's注册的对象使用 ConversionService。
+
+头解析器
+此语言环境解析程序检查accept-language客户端发送的请求中的标头（例如Web浏览器）。通常这个头域包含客户端操作系统的区域设置。请注意，此解析器不支持时区信息。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+拦截器 登陆和(aop)日志
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+	<localRepository>E:/mavenLocalRepository</localRepository>
+
+	<interactiveMode>true</interactiveMode>
+	<usePluginRegistry>false</usePluginRegistry>
+	<offline>false</offline>
+	
+	<pluginGroups>
+	</pluginGroups>
+
+	<proxies>
+	</proxies>
+
+	<servers>
+		<server>
+			<id>nexus-releases</id>
+			<username>admin</username>
+			<password>admin123</password>
+		</server>
+		<server>
+			<id>nexus-snapshots</id>
+			<username>admin</username>
+			<password>admin123</password>
+		</server>
+	</servers>
+
+	<mirrors>
+		
+		<mirror>
+			<!--This sends everything else to /public -->
+			<id>releases</id>
+			<mirrorOf>central</mirrorOf>
+			<url>http://wb-server:8081/repository/wb-maven-repository-group/</url>
+		</mirror>
+		<mirror>
+			<!--This is used to direct the public snapshots repo in the profile below 
+				over to a different nexus group -->
+			<id>snapshots</id>
+			<mirrorOf>public-snapshots</mirrorOf>
+			<url>http://wb-server:8081/repository/wb-repositories-rsnapshots/</url>
+		</mirror>
+		
+	</mirrors>
+
+	<profiles>
+		<profile>
+			<id>nexus</id>
+			<repositories>
+				<repository>
+					<id>central</id>
+					<url>http://central</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>true</enabled>
+					</snapshots>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>central</id>
+					<url>http://central</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>true</enabled>
+					</snapshots>
+				</pluginRepository>
+			</pluginRepositories>
+		</profile>
+		<profile>
+			<!--this profile will allow snapshots to be searched when activated -->
+			<id>public-snapshots</id>
+			<repositories>
+				<repository>
+					<id>public-snapshots</id>
+					<url>http://wb-server:8081/repository/wb-repositories-rsnapshots/</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>true</enabled>
+					</snapshots>
+				</repository>
+			</repositories>
+			<pluginRepositories>
+				<pluginRepository>
+					<id>public-snapshots</id>
+					<url>http://public-snapshots</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>true</enabled>
+					</snapshots>
+				</pluginRepository>
+			</pluginRepositories>
+			
+		</profile>
+		<profile>
+			<id>skiptests</id>
+			<activation>
+				<property>
+					<name>!maven.test.skip</name>
+				</property>
+			</activation>
+			<properties>
+				<maven.test.skip>true</maven.test.skip>
+			</properties>
+		</profile>
+		<profile>
+			<id>jdk-1.8</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<jdk>1.8</jdk>
+			</activation>
+			<properties>
+				<maven.compiler.source>1.8</maven.compiler.source>
+				<maven.compiler.target>1.8</maven.compiler.target>
+				<maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
+			</properties>
+		</profile>
+	</profiles>
+
+	<activeProfiles>
+		<activeProfile>nexus</activeProfile>
+		<activeProfile>public-snapshots</activeProfile>
+	</activeProfiles>
+</settings>
